@@ -1,8 +1,19 @@
 let canvas = document.getElementById('gameCanvas');
 let ctx = canvas.getContext('2d');
-let ball = { x: 50, y: 550, radius: 20, color: 'blue', speed: 5, velocityY: 0, isJumping: false };
+
+let ball = {
+    x: 50,
+    y: 500,
+    radius: 20,
+    color: 'blue',
+    speed: 5,
+    velocityY: 0,
+    isJumping: false
+};
+
 let obstacles = [];
 let lava = { x: 0, y: 550, width: 800, height: 50 };
+let floorHeight = 10; // Height of the floor
 let isGameOver = false;
 
 // Fuel settings
@@ -50,6 +61,7 @@ function update() {
     drawBall();
     drawObstacles();
     drawLava();
+    drawFloor();
     drawFuelBar();
     checkCollision();
     
@@ -69,13 +81,14 @@ function moveBall() {
         ball.isJumping = true;
     }
 
-    if (ball.y + ball.radius >= canvas.height) {
-        ball.y = canvas.height - ball.radius;
-        ball.velocityY = 0;
-        ball.isJumping = false;
+    // Check for collision with the floor
+    if (ball.y + ball.radius >= canvas.height - floorHeight) {
+        ball.y = canvas.height - floorHeight - ball.radius; // Set on floor
+        ball.velocityY = 0; // Reset velocity
+        ball.isJumping = false; // Reset jumping state
     }
 
-    // Keep the ball within canvas boundaries
+    // Keep the ball within canvas boundaries (left/right)
     if (ball.x < ball.radius) ball.x = ball.radius;
     if (ball.x > canvas.width - ball.radius) ball.x = canvas.width - ball.radius;
 
@@ -103,6 +116,11 @@ function drawObstacles() {
 function drawLava() {
     ctx.fillStyle = 'orange';
     ctx.fillRect(lava.x, lava.y, lava.width, lava.height);
+}
+
+function drawFloor() {
+    ctx.fillStyle = 'green';
+    ctx.fillRect(0, canvas.height - floorHeight, canvas.width, floorHeight); // Draw floor
 }
 
 function drawFuelBar() {
@@ -141,7 +159,7 @@ function gameOver() {
 
 function respawn() {
     ball.x = 50;
-    ball.y = 550; // Reset position
+    ball.y = 500; // Reset position
     ball.velocityY = 0; // Reset velocity
     fuel = maxFuel; // Reset fuel
     isGameOver = false;
