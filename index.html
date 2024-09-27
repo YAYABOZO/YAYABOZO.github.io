@@ -3,18 +3,106 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ball Game</title>
+    <title>Ball Gravity Game</title>
     <style>
-        canvas { border: 1px solid black; }
-        body { display: flex; flex-direction: column; align-items: center; }
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+        canvas {
+            display: block;
+            background-color: #f0f0f0;
+        }
     </style>
 </head>
 <body>
-    <h1>Ball Game</h1>
-    <canvas id="gameCanvas" width="800" height="600"></canvas>
-    <button id="loginBtn">Login</button>
-    <button id="guestBtn">Play as Guest</button>
-    <script src="game.js"></script>
+<canvas id="gameCanvas"></canvas>
+
+<script>
+    // Setup the canvas
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // Canvas size
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    // Ball properties
+    const ball = {
+        x: canvas.width / 2,
+        y: canvas.height / 2,
+        radius: 20,
+        color: 'blue',
+        velocityX: 0,
+        velocityY: 0
+    };
+
+    // Game settings
+    const gravity = 0.5;
+    const friction = 0.95;
+    const speed = 2;
+    const keys = {};
+
+    // Event listeners for key press and release
+    window.addEventListener('keydown', (e) => keys[e.key] = true);
+    window.addEventListener('keyup', (e) => keys[e.key] = false);
+
+    // Game loop
+    function gameLoop() {
+        // Update ball velocity based on key presses (WASD)
+        if (keys['w'] || keys['W']) {
+            ball.velocityY -= speed;
+        }
+        if (keys['s'] || keys['S']) {
+            ball.velocityY += speed;
+        }
+        if (keys['a'] || keys['A']) {
+            ball.velocityX -= speed;
+        }
+        if (keys['d'] || keys['D']) {
+            ball.velocityX += speed;
+        }
+
+        // Apply gravity
+        ball.velocityY += gravity;
+
+        // Update ball position
+        ball.x += ball.velocityX;
+        ball.y += ball.velocityY;
+
+        // Floor collision
+        if (ball.y + ball.radius > canvas.height) {
+            ball.y = canvas.height - ball.radius;
+            ball.velocityY *= -friction;  // Invert and reduce velocity to simulate bounce
+            ball.velocityX *= friction;   // Apply friction to horizontal movement
+        }
+
+        // Left and right boundary collision
+        if (ball.x - ball.radius < 0) {
+            ball.x = ball.radius;
+            ball.velocityX *= -friction;
+        }
+        if (ball.x + ball.radius > canvas.width) {
+            ball.x = canvas.width - ball.radius;
+            ball.velocityX *= -friction;
+        }
+
+        // Clear the canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Draw the ball
+        ctx.beginPath();
+        ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+        ctx.fillStyle = ball.color;
+        ctx.fill();
+        ctx.closePath();
+
+        // Request the next animation frame
+        requestAnimationFrame(gameLoop);
+    }
+
+    // Start the game loop
+    gameLoop();
+</script>
 </body>
 </html>
-  
