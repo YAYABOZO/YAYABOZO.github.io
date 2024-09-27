@@ -1,12 +1,23 @@
 let canvas = document.getElementById('gameCanvas');
 let ctx = canvas.getContext('2d');
-let ball = { x: 50, y: 50, radius: 20, color: 'blue' };
+let ball = { x: 50, y: 50, radius: 20, color: 'blue', speed: 5 };
 let obstacles = [];
 let lava = { x: 0, y: 550, width: 800, height: 50 };
 let isGameOver = false;
 
 // Simple player structure
 let currentPlayer = { username: null, isGuest: false };
+
+// Handle user input
+let keys = {};
+
+document.addEventListener('keydown', (e) => {
+    keys[e.key] = true;
+});
+
+document.addEventListener('keyup', (e) => {
+    keys[e.key] = false;
+});
 
 document.getElementById('guestBtn').onclick = () => {
     currentPlayer.isGuest = true;
@@ -30,6 +41,7 @@ function startGame() {
 
 function update() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    moveBall();
     drawBall();
     drawObstacles();
     drawLava();
@@ -38,6 +50,19 @@ function update() {
     if (!isGameOver) {
         requestAnimationFrame(update);
     }
+}
+
+function moveBall() {
+    if (keys['w']) ball.y -= ball.speed; // Move up
+    if (keys['s']) ball.y += ball.speed; // Move down
+    if (keys['a']) ball.x -= ball.speed; // Move left
+    if (keys['d']) ball.x += ball.speed; // Move right
+
+    // Keep the ball within canvas boundaries
+    if (ball.x < ball.radius) ball.x = ball.radius;
+    if (ball.x > canvas.width - ball.radius) ball.x = canvas.width - ball.radius;
+    if (ball.y < ball.radius) ball.y = ball.radius;
+    if (ball.y > canvas.height - ball.radius) ball.y = canvas.height - ball.radius;
 }
 
 function drawBall() {
