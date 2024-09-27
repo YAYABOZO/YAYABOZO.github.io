@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ball Gravity Game</title>
+    <title>skap v2</title>
     <style>
         body {
             margin: 0;
@@ -38,12 +38,10 @@
     };
 
     // Game settings
-    const gravity = 0.5;
+    const gravity = 1;
     const friction = 0.95;
-    const speed = 2;
+    const speed = 0.1;
     const keys = {};
-
-    // Event listeners for key press and release
     window.addEventListener('keydown', (e) => keys[e.key] = true);
     window.addEventListener('keyup', (e) => keys[e.key] = false);
 
