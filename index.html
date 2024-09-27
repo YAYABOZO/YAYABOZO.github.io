@@ -1,1 +1,123 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>skap</title><style>*{margin:0;padding:0;box-sizing:border-box;}body,html{height:100%;overflow:hidden;font-family:Arial,sans-serif;}canvas{display:block;background-color:#111;}.fuel-bar{position:absolute;top:20px;left:20px;width:200px;height:20px;background-color:gray;border-radius:5px;overflow:hidden;}.fuel{width:100%;height:100%;background-color:limegreen;}</style></head><body><div class="fuel-bar"><div class="fuel"></div></div><canvas id="gameCanvas"></canvas><script>const a=document.getElementById('gameCanvas'),b=a.getContext('2d');a.width=window.innerWidth,a.height=window.innerHeight;const c={x:a.width/2,y:a.height/2,radius:30,dx:0,dy:0,colorAngle:0,speed:5,gravity:.5,lift:-10,fuel:100,maxFuel:100,fuelConsumption:1,fuelRegen:2,isFlying:!1,isGrounded:!1},d={a:!1,d:!1,w:!1};function e(){c.colorAngle+=1,b.beginPath(),b.arc(c.x,c.y,c.radius,0,2*Math.PI),b.fillStyle=`hsl(${c.colorAngle%360},100%,50%)`,b.fill(),b.closePath()}function f(){d.a&&(c.dx=-c.speed),d.d&&(c.dx=c.speed),!d.a&&!d.d&&(c.dx=0),c.dy+=c.gravity,d.w&&c.fuel>0?(c.dy=c.lift,c.fuel-=c.fuelConsumption,c.isFlying=!0):c.isFlying=!1,c.x+=c.dx,c.y+=c.dy,c.y+c.radius>=a.height?(c.dy=0,c.y=a.height-c.radius,c.isGrounded=!0,c.fuel<c.maxFuel&&(c.fuel+=c.fuelRegen,c.fuel>c.maxFuel&&(c.fuel=c.maxFuel))):c.isGrounded=!1,c.x-c.radius<=0&&(c.x=c.radius),c.x+c.radius>=a.width&&(c.x=a.width-c.radius)}function g(){const h=document.querySelector('.fuel');h.style.width=`${c.fuel/c.maxFuel*100}%`,c.fuel<=0?h.style.backgroundColor='red':h.style.backgroundColor='limegreen'}function i(){b.clearRect(0,0,a.width,a.height),e(),f(),g(),requestAnimationFrame(i)}window.addEventListener('keydown',h=>{'a'===h.key&&(d.a=!0),'d'===h.key&&(d.d=!0),'w'===h.key&&c.fuel>0&&(d.w=!0)}),window.addEventListener('keyup',h=>{'a'===h.key&&(d.a=!1),'d'===h.key&&(d.d=!1),'w'===h.key&&(d.w=!1)}),i();</script></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="https://cdn.classlink.com/production/launchpad/resources/images/favicon/favicon-32x32.png">
+    
+    <!-- CSS Styling -->
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: black;
+            color: white;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+        }
+        .logo {
+            font-size: 4rem;
+            font-weight: bold;
+            text-align: center;
+            margin-top: -100px; /* To move the logo up a bit */
+            color: white;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.8), 0 0 20px rgba(255, 255, 255, 1);
+            animation: glow 1.5s infinite alternate;
+        }
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 10px rgba(255, 255, 255, 0.8), 0 0 20px rgba(255, 255, 255, 1);
+            }
+            to {
+                text-shadow: 0 0 20px rgba(255, 255, 255, 1), 0 0 30px rgba(255, 255, 255, 1);
+            }
+        }
+        audio {
+            margin-top: 50px;
+        }
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        .control-btn {
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+        }
+        .control-btn img {
+            width: 50px;
+            height: 50px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Glowing Logo -->
+    <div class="logo">Music</div>
+    <!-- Audio Player -->
+    <audio id="audioPlayer" controls>
+        <source src="" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+    <!-- Control Buttons -->
+    <div class="controls">
+        <button id="prevBtn" class="control-btn">
+            <img src="https://myapps-classl.ink/assets/backward.png" alt="Previous">
+        </button>
+        <button id="playPauseBtn" class="control-btn">
+            <img src="https://myapps-classl.ink/assets/pause.png" alt="Play/Pause">
+        </button>
+        <button id="nextBtn" class="control-btn">
+            <img src="https://myapps-classl.ink/assets/fast-forward.png" alt="Next">
+        </button>
+    </div>
+    <script>
+        const songs = [
+            '/songs/hou-emi.mp3',
+            '/songs/sad-xxx.mp3',
+            '/songs/stan-emi.mp3'
+        ];
+        let currentSongIndex = Math.floor(Math.random() * songs.length);
+        const audioPlayer = document.getElementById('audioPlayer');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        audioPlayer.src = songs[currentSongIndex];
+        audioPlayer.load();
+        function updatePlayPauseIcon() {
+            const icon = playPauseBtn.querySelector('img');
+            if (audioPlayer.paused) {
+                icon.src = 'https://myapps-classl.ink/assets/pause.png';
+            } else {
+                icon.src = 'https://myapps-classl.ink/assets/pause.png'; // Replace with play icon if needed
+            }
+        }
+        playPauseBtn.addEventListener('click', () => {
+            if (audioPlayer.paused) {
+                audioPlayer.play();
+            } else {
+                audioPlayer.pause();
+            }
+            updatePlayPauseIcon();
+        });
+        nextBtn.addEventListener('click', () => {
+            currentSongIndex = (currentSongIndex + 1) % songs.length;
+            audioPlayer.src = songs[currentSongIndex];
+            audioPlayer.play();
+            updatePlayPauseIcon();
+        });
+        prevBtn.addEventListener('click', () => {
+            currentSongIndex = (currentSongIndex - 1 + songs.length) % songs.length;
+            audioPlayer.src = songs[currentSongIndex];
+            audioPlayer.play();
+            updatePlayPauseIcon();
+        });
+    </script>
+</body>
+</html>
