@@ -1,9 +1,15 @@
 let canvas = document.getElementById('gameCanvas');
 let ctx = canvas.getContext('2d');
-let ball = { x: 50, y: 50, radius: 20, color: 'blue', speed: 5 };
+let ball = { x: 50, y: 550, radius: 20, color: 'blue', speed: 5, velocityY: 0, isJumping: false };
 let obstacles = [];
 let lava = { x: 0, y: 550, width: 800, height: 50 };
 let isGameOver = false;
+
+// Fuel settings
+let fuel = 100; // Fuel level (0 to 100)
+const fuelConsumptionRate = 0.5; // Rate of fuel consumption when moving up
+const fuelRegenerationRate = 0.1; // Rate of fuel regeneration
+const maxFuel = 100;
 
 // Simple player structure
 let currentPlayer = { username: null, isGuest: false };
@@ -27,7 +33,6 @@ document.getElementById('guestBtn').onclick = () => {
 document.getElementById('loginBtn').onclick = () => {
     const username = prompt("Enter username:");
     const password = prompt("Enter password:");
-    // Simulate login (should verify against a backend in real implementation)
     currentPlayer.username = username;
     startGame();
 };
@@ -45,6 +50,7 @@ function update() {
     drawBall();
     drawObstacles();
     drawLava();
+    drawFuelBar();
     checkCollision();
     
     if (!isGameOver) {
@@ -53,16 +59,31 @@ function update() {
 }
 
 function moveBall() {
-    if (keys['w']) ball.y -= ball.speed; // Move up
-    if (keys['s']) ball.y += ball.speed; // Move down
-    if (keys['a']) ball.x -= ball.speed; // Move left
-    if (keys['d']) ball.x += ball.speed; // Move right
+    // Apply gravity
+    ball.velocityY += 0.2; // Gravity effect
+    ball.y += ball.velocityY;
+
+    if (keys['w'] && fuel > 0 && !ball.isJumping) {
+        ball.velocityY = -5; // Jumping effect
+        fuel -= fuelConsumptionRate; // Consume fuel
+        ball.isJumping = true;
+    }
+
+    if (ball.y + ball.radius >= canvas.height) {
+        ball.y = canvas.height - ball.radius;
+        ball.velocityY = 0;
+        ball.isJumping = false;
+    }
 
     // Keep the ball within canvas boundaries
     if (ball.x < ball.radius) ball.x = ball.radius;
     if (ball.x > canvas.width - ball.radius) ball.x = canvas.width - ball.radius;
-    if (ball.y < ball.radius) ball.y = ball.radius;
-    if (ball.y > canvas.height - ball.radius) ball.y = canvas.height - ball.radius;
+
+    // Regenerate fuel over time
+    if (!keys['w'] && fuel < maxFuel) {
+        fuel += fuelRegenerationRate;
+        if (fuel > maxFuel) fuel = maxFuel;
+    }
 }
 
 function drawBall() {
@@ -82,6 +103,13 @@ function drawObstacles() {
 function drawLava() {
     ctx.fillStyle = 'orange';
     ctx.fillRect(lava.x, lava.y, lava.width, lava.height);
+}
+
+function drawFuelBar() {
+    ctx.fillStyle = 'grey';
+    ctx.fillRect(10, 10, 200, 20); // Background bar
+    ctx.fillStyle = 'green';
+    ctx.fillRect(10, 10, 2 * fuel, 20); // Fuel level
 }
 
 function checkCollision() {
@@ -113,7 +141,9 @@ function gameOver() {
 
 function respawn() {
     ball.x = 50;
-    ball.y = 50;
+    ball.y = 550; // Reset position
+    ball.velocityY = 0; // Reset velocity
+    fuel = maxFuel; // Reset fuel
     isGameOver = false;
     startGame();
 }
