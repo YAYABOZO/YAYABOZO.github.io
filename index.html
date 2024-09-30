@@ -5,30 +5,228 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Geometry Dash Clone</title>
     <style>
-        body{margin:0;background-color:#000;display:flex;justify-content:center;align-items:center;height:100vh;}
-        canvas{background-color:#222;}
+        body {
+            margin: 0;
+            background-color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        canvas {
+            background-color: #222;
+        }
     </style>
 </head>
 <body>
-    <canvas id="a"></canvas>
+    <canvas id="gameCanvas"></canvas>
+
     <script>
-        const c=document.getElementById("a").getContext("2d");
-        const w=800,h=400;let p={x:50,y:300,width:50,height:50,s:0,g:0.8,j:-15,h:false},o=[],g=false,s=0,hb=false,md=200,ow=50,oh=50,hbShrink=0.8;
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
 
-        function load() {p.h=localStorage.getItem('h')==='true';}
-        function grant() {if(s>=10){p.h=true;localStorage.setItem('h','true');}}
-        function create() {const l=o[o.length-1];if(!l||l.x<700)o.push({x:w,y:h-oh,width:ow,height:oh});}
-        function jump() {if(p.y+p.height>=h)p.s=p.j;}
-        function restart() {g=false;s=0;p={x:50,y:300,width:50,height:50,s:0,g:0.8,j:-15,h:localStorage.getItem('h')==='true'};o=[];loop();}
-        document.addEventListener('keydown',function(e){if(e.code==='Space'||e.code==='KeyW'){if(!g)jump();}if(e.code==='KeyR'&&g)restart();if(e.code==='KeyO')hb=!hb;});
+        // Set the canvas size
+        canvas.width = 800;
+        canvas.height = 400;
 
-        function drawPlayer() {c.fillStyle="#FF6347";c.fillRect(p.x,p.y,p.width,p.height);if(p.h)drawCoat();}
-        function drawObstacle(b) {c.fillStyle="#FF0000";c.beginPath();c.moveTo(b.x,b.y+b.height);c.lineTo(b.x+b.width/2,b.y);c.lineTo(b.x+b.width,b.y+b.height);c.closePath();c.fill();}
-        function drawCoat() {const x=p.x+(p.width/2)-20,y=p.y-40;c.fillStyle="#0000FF";c.fillRect(x,y,40,30);c.fillStyle="yellow";c.beginPath();c.moveTo(x+20,y+5);c.lineTo(x+25,y+20);c.lineTo(x+40,y+20);c.lineTo(x+27,y+30);c.lineTo(x+32,y+45);c.lineTo(x+20,y+35);c.lineTo(x+8,y+45);c.lineTo(x+13,y+30);c.lineTo(x+0,y+20);c.lineTo(x+15,y+20);c.closePath();c.fill();}
-        function drawHitbox(b) {const hw=b.width*hbShrink,hh=b.height*hbShrink,hx=b.x+(b.width-hw)/2,hy=b.y+(b.height-hh)/2;c.strokeStyle="yellow";c.strokeRect(hx,hy,hw,hh);}
-        function checkCollision(b) {const hw=b.width*hbShrink,hh=b.height*hbShrink,hx=b.x+(b.width-hw)/2,hy=b.y+(b.height-hh)/2;return p.x<hx+hw&&p.x+p.width>hx&&p.y<hy+hh&&p.y+p.height>hy;}
-        function loop() {if(g){c.fillStyle="#FFF";c.font="40px Arial";c.fillText("Game Over! Press R to restart.",100,h/2);return;}c.clearRect(0,0,w,h);p.s+=p.g;p.y+=p.s;if(p.y+p.height>h){p.y=h-p.height;p.s=0;}drawPlayer();o.forEach((b,i)=>{b.x-=5;if(b.x+b.width<0){o.splice(i,1);s++;grant();}drawObstacle(b);if(hb)drawHitbox(b);if(checkCollision(b))g=true;});if(Math.random()<0.02)create();c.fillStyle="#FFF";c.font="20px Arial";c.fillText("Score: "+s,10,20);requestAnimationFrame(loop);}
-        load();loop();
+        // Game variables
+        let player = { x: 50, y: 300, width: 50, height: 50, speedY: 0, gravity: 0.8, jumpPower: -15, hasCoat: false };
+        let obstacles = [];
+        const obstacleSpeed = 5;
+        let gameOver = false;
+        let score = 0;
+        let showHitboxes = false;
+        const minObstacleDistance = 200;
+        const obstacleWidth = 50;
+        const obstacleHeight = 50;
+
+        // Grace period hitbox (smaller than the spike)
+        const hitboxShrinkFactor = 0.8;
+
+        // Load coat ownership from local storage
+        function loadCoat() {
+            const hasCoat = localStorage.getItem('hasCoat') === 'true';
+            player.hasCoat = hasCoat;
+        }
+
+        // Grant coat at score 10
+        function grantCoat() {
+            if (score >= 10) {
+                player.hasCoat = true;
+                localStorage.setItem('hasCoat', 'true'); // Save to local storage
+            }
+        }
+
+        // Function to create new obstacles
+        function createObstacle() {
+            const yPos = canvas.height - obstacleHeight;
+            const lastObstacle = obstacles[obstacles.length - 1];
+
+            if (!lastObstacle || lastObstacle.x < canvas.width - minObstacleDistance) {
+                obstacles.push({ x: canvas.width, y: yPos, width: obstacleWidth, height: obstacleHeight });
+            }
+        }
+
+        // Handle jump
+        function jump() {
+            if (player.y + player.height >= canvas.height) {
+                player.speedY = player.jumpPower;
+            }
+        }
+
+        // Restart the game
+        function restartGame() {
+            gameOver = false;
+            score = 0;
+            player = { x: 50, y: 300, width: 50, height: 50, speedY: 0, gravity: 0.8, jumpPower: -15, hasCoat: localStorage.getItem('hasCoat') === 'true' };
+            obstacles = [];
+            gameLoop();
+        }
+
+        // Handle key press
+        document.addEventListener('keydown', function (event) {
+            if (event.code === 'Space' || event.code === 'KeyW') {
+                if (!gameOver) jump();
+            }
+            if (event.code === 'KeyR' && gameOver) {
+                restartGame();
+            }
+            if (event.code === 'KeyO') {
+                showHitboxes = !showHitboxes; // Press O to toggle hitbox visibility
+            }
+        });
+
+        // Draw player
+        function drawPlayer() {
+            ctx.fillStyle = "#FF6347";
+            ctx.fillRect(player.x, player.y, player.width, player.height);
+
+            // Draw coat if player has it
+            if (player.hasCoat) {
+                drawCoat();
+            }
+        }
+
+        // Draw obstacles (triangles)
+        function drawObstacle(obstacle) {
+            ctx.fillStyle = "#FF0000";
+            ctx.beginPath();
+            ctx.moveTo(obstacle.x, obstacle.y + obstacle.height);
+            ctx.lineTo(obstacle.x + obstacle.width / 2, obstacle.y);
+            ctx.lineTo(obstacle.x + obstacle.width, obstacle.y + obstacle.height);
+            ctx.closePath();
+            ctx.fill();
+        }
+
+        // Draw coat on player
+        function drawCoat() {
+            const coatX = player.x + (player.width / 2) - 20; // Center the coat horizontally
+            const coatY = player.y - 40; // Position the coat above the player
+            ctx.fillStyle = "#0000FF"; // Blue color for the coat
+            ctx.fillRect(coatX, coatY, 40, 30); // Draw the coat
+
+            // Draw star in the middle of the coat
+            ctx.fillStyle = "yellow";
+            ctx.beginPath();
+            ctx.moveTo(coatX + 20, coatY + 5);
+            ctx.lineTo(coatX + 25, coatY + 20);
+            ctx.lineTo(coatX + 40, coatY + 20);
+            ctx.lineTo(coatX + 27, coatY + 30);
+            ctx.lineTo(coatX + 32, coatY + 45);
+            ctx.lineTo(coatX + 20, coatY + 35);
+            ctx.lineTo(coatX + 8, coatY + 45);
+            ctx.lineTo(coatX + 13, coatY + 30);
+            ctx.lineTo(coatX + 0, coatY + 20);
+            ctx.lineTo(coatX + 15, coatY + 20);
+            ctx.closePath();
+            ctx.fill();
+        }
+
+        // Draw hitboxes (smaller than the actual triangles)
+        function drawHitbox(obstacle) {
+            const hitboxWidth = obstacle.width * hitboxShrinkFactor;
+            const hitboxHeight = obstacle.height * hitboxShrinkFactor;
+            const hitboxX = obstacle.x + (obstacle.width - hitboxWidth) / 2;
+            const hitboxY = obstacle.y + (obstacle.height - hitboxHeight) / 2;
+
+            ctx.strokeStyle = "yellow";
+            ctx.strokeRect(hitboxX, hitboxY, hitboxWidth, hitboxHeight);
+        }
+
+        // Check collision with smaller hitbox for grace period
+        function checkCollision(obstacle) {
+            const hitboxWidth = obstacle.width * hitboxShrinkFactor;
+            const hitboxHeight = obstacle.height * hitboxShrinkFactor;
+            const hitboxX = obstacle.x + (obstacle.width - hitboxWidth) / 2;
+            const hitboxY = obstacle.y + (obstacle.height - hitboxHeight) / 2;
+
+            return player.x < hitboxX + hitboxWidth &&
+                   player.x + player.width > hitboxX &&
+                   player.y < hitboxY + hitboxHeight &&
+                   player.y + player.height > hitboxY;
+        }
+
+        // Game loop
+        function gameLoop() {
+            if (gameOver) {
+                ctx.fillStyle = "#FFF";
+                ctx.font = "40px Arial";
+                ctx.fillText("Game Over! Press R to restart.", 100, canvas.height / 2);
+                return;
+            }
+
+            // Clear the canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Update player
+            player.speedY += player.gravity;
+            player.y += player.speedY;
+            if (player.y + player.height > canvas.height) {
+                player.y = canvas.height - player.height;
+                player.speedY = 0;
+            }
+
+            drawPlayer();
+
+            // Move and draw obstacles
+            obstacles.forEach((obstacle, index) => {
+                obstacle.x -= obstacleSpeed;
+                if (obstacle.x + obstacle.width < 0) {
+                    obstacles.splice(index, 1); // Remove obstacle if off-screen
+                    score++;
+                    grantCoat(); // Check for coat after scoring
+                }
+
+                drawObstacle(obstacle);
+
+                // Draw hitbox if hitboxes are enabled
+                if (showHitboxes) {
+                    drawHitbox(obstacle);
+                }
+
+                // Check collision
+                if (checkCollision(obstacle)) {
+                    gameOver = true;
+                }
+            });
+
+            // Create obstacles periodically
+            if (Math.random() < 0.02) {
+                createObstacle();
+            }
+
+            // Display score
+            ctx.fillStyle = "#FFF";
+            ctx.font = "20px Arial";
+            ctx.fillText("Score: " + score, 10, 20);
+
+            // Continue the game loop
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Load the coat from local storage and start the game loop
+        loadCoat();
+        gameLoop();
     </script>
 </body>
 </html>
