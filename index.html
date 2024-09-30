@@ -118,24 +118,35 @@
             ctx.fill();
         }
 
-        // Draw coat on player
+        // Draw improved coat on player
         function drawCoat() {
-            const coatX = player.x + (player.width / 2) - 20; // Center the coat horizontally
-            const coatY = player.y - 40; // Position the coat above the player
+            const coatX = player.x + (player.width / 2) - 25; // Center the coat horizontally
+            const coatY = player.y - 50; // Position the coat above the player
+
+            // Draw the coat's main body
             ctx.fillStyle = "#0000FF"; // Blue color for the coat
-            ctx.fillRect(coatX, coatY, 40, 30); // Draw the coat
+            ctx.fillRect(coatX, coatY, 50, 30); // Draw the coat
+
+            // Draw collar
+            ctx.fillStyle = "#003366"; // Darker blue for collar
+            ctx.fillRect(coatX + 15, coatY - 10, 20, 10); // Draw collar
+
+            // Draw sleeves
+            ctx.fillStyle = "#0000FF"; // Blue color for sleeves
+            ctx.fillRect(coatX - 10, coatY + 5, 10, 20); // Left sleeve
+            ctx.fillRect(coatX + 50, coatY + 5, 10, 20); // Right sleeve
 
             // Draw star in the middle of the coat
             ctx.fillStyle = "yellow";
             ctx.beginPath();
-            ctx.moveTo(coatX + 20, coatY + 5);
-            ctx.lineTo(coatX + 25, coatY + 20);
-            ctx.lineTo(coatX + 40, coatY + 20);
-            ctx.lineTo(coatX + 27, coatY + 30);
-            ctx.lineTo(coatX + 32, coatY + 45);
-            ctx.lineTo(coatX + 20, coatY + 35);
-            ctx.lineTo(coatX + 8, coatY + 45);
-            ctx.lineTo(coatX + 13, coatY + 30);
+            ctx.moveTo(coatX + 25, coatY + 5);
+            ctx.lineTo(coatX + 30, coatY + 20);
+            ctx.lineTo(coatX + 45, coatY + 20);
+            ctx.lineTo(coatX + 32, coatY + 30);
+            ctx.lineTo(coatX + 37, coatY + 45);
+            ctx.lineTo(coatX + 25, coatY + 35);
+            ctx.lineTo(coatX + 13, coatY + 45);
+            ctx.lineTo(coatX + 18, coatY + 30);
             ctx.lineTo(coatX + 0, coatY + 20);
             ctx.lineTo(coatX + 15, coatY + 20);
             ctx.closePath();
