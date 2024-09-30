@@ -121,7 +121,7 @@
         // Draw improved coat on player
         function drawCoat() {
             const coatX = player.x + (player.width / 2) - 25; // Center the coat horizontally
-            const coatY = player.y - 50; // Position the coat above the player
+            const coatY = player.y + 15; // Move the coat up by 15 pixels
 
             // Draw the coat's main body
             ctx.fillStyle = "#0000FF"; // Blue color for the coat
@@ -135,22 +135,6 @@
             ctx.fillStyle = "#0000FF"; // Blue color for sleeves
             ctx.fillRect(coatX - 10, coatY + 5, 10, 20); // Left sleeve
             ctx.fillRect(coatX + 50, coatY + 5, 10, 20); // Right sleeve
-
-            // Draw star in the middle of the coat
-            ctx.fillStyle = "yellow";
-            ctx.beginPath();
-            ctx.moveTo(coatX + 25, coatY + 5);
-            ctx.lineTo(coatX + 30, coatY + 20);
-            ctx.lineTo(coatX + 45, coatY + 20);
-            ctx.lineTo(coatX + 32, coatY + 30);
-            ctx.lineTo(coatX + 37, coatY + 45);
-            ctx.lineTo(coatX + 25, coatY + 35);
-            ctx.lineTo(coatX + 13, coatY + 45);
-            ctx.lineTo(coatX + 18, coatY + 30);
-            ctx.lineTo(coatX + 0, coatY + 20);
-            ctx.lineTo(coatX + 15, coatY + 20);
-            ctx.closePath();
-            ctx.fill();
         }
 
         // Draw hitboxes (smaller than the actual triangles)
