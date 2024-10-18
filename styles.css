@@ -1,0 +1,55 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body, html {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #222;
+    font-family: Arial, sans-serif;
+    color: white;
+}
+
+.container {
+    text-align: center;
+}
+
+h1 {
+    font-size: 4rem;
+    margin-bottom: 1.5rem;
+}
+
+.button-container {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.games-btn, .browse-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 30px;
+    border: none;
+    background-color: black;
+    color: white;
+    border-radius: 25px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    text-decoration: none;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+    transition: box-shadow 0.3s ease-in-out;
+}
+
+.games-btn:hover, .browse-btn:hover {
+    box-shadow: 0 0 30px rgba(255, 255, 255, 0.8), 0 0 60px rgba(255, 255, 255, 0.4);
+}
+
+.games-btn i, .browse-btn i {
+    margin-right: 5px;
+    font-size: 1.2rem;
+}
